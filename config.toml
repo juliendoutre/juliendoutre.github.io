@@ -1,0 +1,4 @@
+baseURL = 'https://juliendoutre.github.io'
+languageCode = 'en-us'
+title = 'Personal website'
+theme = "ananke"
