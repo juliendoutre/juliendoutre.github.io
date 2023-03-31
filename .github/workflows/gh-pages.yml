@@ -11,8 +11,8 @@ jobs:
       - name: checkout dependencies
         uses: actions/checkout@v3
         with:
-          submodules: true  # Fetch Hugo themes (true OR recursive)
-          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+          submodules: true
+          fetch-depth: 0
       - name: install hugo
         uses: peaceiris/actions-hugo@v2
         with:
