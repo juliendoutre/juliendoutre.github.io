@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://juliendoutre.github.io/sitemap.xml
