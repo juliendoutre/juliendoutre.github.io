@@ -41,9 +41,9 @@ After exploring the Hugo theme showcase I ended up choosing the [Congo theme](ht
 
 > The only non-trivial customization was changing the default flaticon. I had to lookup some other persons' blogs source code to find the right file names to use in the `static` folder of my project.
 
-Regarding the hosting, I considered for a second deploying everything in my [AWS](https://aws.amazon.com/) account using [S3](https://aws.amazon.com/s3/) and [CloudFront](https://aws.amazon.com/cloudfront/). But in the end, [Github pages](https://pages.github.com/) is easier to use, integrates seamlessly with [Github actions](https://github.com/features/actions), plus it's free (I don't even have to pay for a domain name)!
+Regarding the hosting, I considered for a second deploying everything in my [AWS](https://aws.amazon.com/) account using [S3](https://aws.amazon.com/s3/) and [CloudFront](https://aws.amazon.com/cloudfront/). But in the end, [GitHub pages](https://pages.github.com/) is easier to use, integrates seamlessly with [GitHub actions](https://github.com/features/actions), plus it's free (I don't even have to pay for a domain name)!
 
-My current development workflow is pushing to the `main` branch, waiting for the github action to generate the `public` folder to the `gh-pages` branch, which is then served by Github pages on the domain matching the repository's name. I'll see how this can be improved in the future!
+My current development workflow is pushing to the `main` branch, waiting for the GitHub action to generate the `public` folder to the `gh-pages` branch, which is then served by GitHub pages on the domain matching the repository's name. I'll see how this can be improved in the future!
 
 In the meantime, if you're curious, you can check this website source code at https://github.com/juliendoutre/juliendoutre.github.io :nerd_face:
 
