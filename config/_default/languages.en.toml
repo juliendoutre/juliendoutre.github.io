@@ -1,25 +1,21 @@
 languageCode = "en"
 languageName = "English"
-displayName = "EN"
-isoCode = "en"
 weight = 1
-rtl = false
-
 title = "Julien Doutre"
-description = "My personal website"
 copyright = ""
-dateFormat = "2006-01-02"
 
 [params]
-  # mainSections = ["section1", "section2"]
+description = "My personal website"
 
-[author]
-  name = "Julien Doutre"
-  image = "img/author.jpg"
-  headline = "I'm a software engineer at Datadog, focusing on detecting security threats at scale."
-  bio = ""
-  links = [
-    { email = "mailto:jul.doutre@gmail.com" },
-    { github = "https://github.com/juliendoutre" },
-    { linkedin = "https://linkedin.com/in/julien.doutre" },
-  ]
+dateFormat = "2006-01-02"
+
+[params.author]
+name = "Julien Doutre"
+image = "img/author.jpg"
+headline = "I'm a software engineer at Datadog, focusing on software supply chain security."
+bio = ""
+links = [
+  { email = "mailto:jul.doutre@gmail.com" },
+  { github = "https://github.com/juliendoutre" },
+  { linkedin = "https://linkedin.com/in/julien.doutre" },
+]
