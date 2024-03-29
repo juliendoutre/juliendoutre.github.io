@@ -9,7 +9,7 @@ date: "2024-03-25"
 
 ## Introduction
 
-If you followed mathematics courses you're probably aware there are several types of numbers. **Natural numbers** (also known as positive integers), **relative integers** with which come the notion of negative numbers, **rationals** which are a ratio of two relative numbers (:exploding_head:), **irrationals** which can't be expressed as a fraction (like \\(\pi\\)), **reals** which are the union of rationals and irrationals, and finally **complex** numbers which can be seen as a pair of two reals.
+If you followed mathematics courses you're probably aware there are several types of numbers. **Natural numbers** (also known as positive integers), **relative integers** with which comes the notion of negative numbers, **rationals** which are a ratio of two relative numbers (:exploding_head:), **irrationals** which can't be expressed as a fraction (like \\(\pi\\)), **reals** which are the union of rationals and irrationals, and finally **complex** numbers which can be seen as a pair of two reals.
 
 ![numbers](/numbers.png)
 
