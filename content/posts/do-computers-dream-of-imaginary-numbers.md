@@ -103,7 +103,7 @@ As we already emphasized, computers have finite resources. And therefore, they c
 However they can reason about an approximated value with a certain error margin. Here comes a notion well known by physicists: [scientific notation](https://en.wikipedia.org/wiki/Scientific_notation).
 
 $$
-\pi \approx 3.18309886184*10^0
+\pi \approx 3.14159265*10^0
 $$
 
 $$
