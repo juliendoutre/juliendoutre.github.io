@@ -63,9 +63,9 @@ type Codec interface {
 
 But enough abstractions for now, let's get to some concrete applications!
 
-## A simple use case
+## A simple use case: color codes
 
-Let's start with something simple: color codes:
+Let's start with something simple:
 ```text
 #3399ff <-- I'm blue, da ba dee...
 ```
@@ -327,3 +327,68 @@ I use the https://github.com/stretchr/testify library for testing. I added it to
 Nice, it works :tada:
 
 Feel free to [check the code so far on GitHub](https://github.com/juliendoutre/godec/tree/6e13d594617e48a4983bafa3f630d499f6cd2abf).
+
+## Property based testing
+
+Testing parsers for some values is nice but it does not provide a great coverage... What about weird corner cases? Will our code handle them just fine?
+
+One approach to cover more test cases is [property based testing](https://en.wikipedia.org/wiki/Software_testing#Property_testing). The goal is to generate test inputs at random, feed them to our code and then check some property is observed for all outputs. In the case of a codec, one simple property we wanna respect is that decoding is the invert function of encoding.
+
+It happens golang provides a property based testing framework without any dependency required! It's based on the [QuickCheck library](https://en.wikipedia.org/wiki/QuickCheck) and can be leveraged as simply as:
+```golang
+// examples/colors/codec_test.go
+[...]
+
+func TestInversibleProperty(t *testing.T) {
+	f := func(expectedRed, expectedGreen, expectedBlue uint8) bool {
+		actualRed := expectedRed
+		actualGreen := expectedGreen
+		actualBlue := expectedBlue
+
+		encoder := colors.Codec(&expectedRed, &expectedGreen, &expectedBlue)
+		out, err := encoder.Encode()
+		if err != nil {
+			return false
+		}
+
+		decoder := colors.Codec(&actualRed, &actualGreen, &actualBlue)
+		remainder, err := decoder.Decode(out)
+		if err != nil {
+			return false
+		}
+
+		return len(remainder) == 0 && expectedRed == actualRed && expectedGreen == actualGreen && expectedBlue == actualBlue
+	}
+
+	if err := quick.Check(f, &quick.Config{}); err != nil {
+		t.Error(err)
+	}
+}
+```
+
+The `quick.Check(f, &quick.Config{})` function is where the magic happens. The library generates random inputs with types matching the `f` function's signature, call it with those arguments and check it returns `true` or raises an error.
+
+## A more involved use case: URLs
+
+Wikipedia does a great job at summarizing the URL format: https://en.wikipedia.org/wiki/URL#Syntax. It even provides a syntax diagram which looks a lot like our state machine from the previous section: ![url](https://upload.wikimedia.org/wikipedia/commons/d/d6/URI_syntax_diagram.svg "Picture by [Alhadis](https://commons.wikimedia.org/wiki/User:Alhadis) on [Wikipedia](https://commons.wikimedia.org/w/index.php?curid=82827943), under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0)")
+
+If we start writing a codec using our existing blocks we find ourselves pretty limited:
+```golang
+// examples/url/codec.go
+package url
+
+import "github.com/juliendoutre/godec"
+
+func Codec(scheme, username, password, host *string, port *uint, path *string, query, fragment *string) godec.Sequence {
+	return godec.Sequence([]godec.Codec{
+		// TODO: parse scheme
+		godec.ExactMatch([]byte(":")),
+		// TODO: parse path
+		godec.NoMoreBytes{},
+	})
+}
+```
+
+We can start by implementing the scheme parser. It's pretty specific to URL parsing, so let's simply keep it as an unexported struct in the `examples/url` package:
+
+WIP
