@@ -326,8 +326,6 @@ I use the https://github.com/stretchr/testify library for testing. I added it to
 
 Nice, it works :tada:
 
-Feel free to [check the code so far on GitHub](https://github.com/juliendoutre/godec/tree/6e13d594617e48a4983bafa3f630d499f6cd2abf).
-
 ## Property based testing
 
 Testing parsers for some values is nice but it does not provide a great coverage... What about weird corner cases? Will our code handle them just fine?
@@ -384,6 +382,8 @@ func Codec(scheme, username, password, host *string, port *uint, path *string, q
 		// TODO: parse scheme
 		godec.ExactMatch([]byte(":")),
 		// TODO: parse path
+		// TODO: parse eventual query
+		// TODO: parse eventual fragment
 		godec.NoMoreBytes{},
 	})
 }
@@ -391,4 +391,153 @@ func Codec(scheme, username, password, host *string, port *uint, path *string, q
 
 We can start by implementing the scheme parser. It's pretty specific to URL parsing, so let's simply keep it as an unexported struct in the `examples/url` package:
 
-WIP
+```golang
+// examples/url/scheme.go
+package url
+
+import (
+	"fmt"
+
+	"github.com/juliendoutre/godec"
+)
+
+type Scheme struct {
+	scheme *string
+}
+
+func (s Scheme) Encode() ([]byte, error) {
+	for _, c := range []byte(*s.scheme) {
+		if !(c == '+') && !(c == '.') && !(c == '-') && !isASCIIDigit(c) && !isASCIILetter(c) {
+			return nil, fmt.Errorf("invalid character %q", c)
+		}
+	}
+
+	return []byte(*s.scheme), nil
+}
+
+func (s Scheme) Decode(input []byte) ([]byte, error) {
+	// Reject empty schemes.
+	if len(input) == 0 {
+		return nil, fmt.Errorf("expected a scheme")
+	}
+
+	// See https://datatracker.ietf.org/doc/html/rfc1738#section-2.1:
+	// Scheme names consist of a sequence of characters. The lower case
+	// letters "a"--"z", digits, and the characters plus ("+"), period
+	// ("."), and hyphen ("-") are allowed. For resiliency, programs
+	// interpreting URLs should treat upper case letters as equivalent to
+	// lower case in scheme names (e.g., allow "HTTP" as well as "http").
+
+	i := 0
+	for i = 0; i < len(input); i++ {
+		if !(input[i] == '+') && !(input[i] == '.') && !(input[i] == '-') && !isASCIIDigit(input[i]) && !isASCIILetter(input[i]) {
+			break
+		}
+	}
+
+	if i == 0 {
+		return nil, fmt.Errorf("expected a scheme")
+	}
+
+	*s.scheme = string(input[:i])
+
+	return input[i:], nil
+}
+
+var _ godec.Codec = Scheme{}
+```
+
+Let's write a dead simple test to validate decoding is working:
+```golang
+// examples/url/codec_test.go
+package url_test
+
+import (
+	"testing"
+
+	"github.com/juliendoutre/godec/examples/url"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestSchemeValidDecoding(t *testing.T) {
+	var scheme string
+	decoder := url.Codec(&scheme, nil, nil, nil, nil, nil, nil, nil)
+	remainder, err := decoder.Decode([]byte("http:"))
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(remainder))
+	assert.Equal(t, "http", scheme)
+}
+```
+
+Implementing the other parsers (check out the complete code at https://github.com/juliendoutre/godec/tree/main/examples/url) is pretty similar, in the end we can write more complete tests:
+```golang
+// examples/url/codec_test.go
+package url_test
+
+import (
+	"testing"
+
+	"github.com/juliendoutre/godec/examples/url"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestSchemeValidHTTPURLDecoding(t *testing.T) {
+	var scheme string
+	var username string
+	var password string
+	var host string
+	var port uint
+	var path string
+	var query string
+	var fragment string
+
+	decoder := url.Codec(&scheme, &username, &password, &host, &port, &path, &query, &fragment)
+	remainder, err := decoder.Decode([]byte("http://google.com:443/test?page=1#title"))
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(remainder))
+	assert.Equal(t, "http", scheme)
+	assert.Equal(t, "", username)
+	assert.Equal(t, "", password)
+	assert.Equal(t, "google.com", host)
+	assert.Equal(t, uint(443), port)
+	assert.Equal(t, "/test", path)
+	assert.Equal(t, "page=1", query)
+	assert.Equal(t, "title", fragment)
+}
+
+func TestSchemeValidPostgresDecoding(t *testing.T) {
+	var scheme string
+	var username string
+	var password string
+	var host string
+	var port uint
+	var path string
+	var query string
+	var fragment string
+
+	decoder := url.Codec(&scheme, &username, &password, &host, &port, &path, &query, &fragment)
+	remainder, err := decoder.Decode([]byte("postgres://user:password@localhost:5432/database"))
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(remainder))
+	assert.Equal(t, "postgres", scheme)
+	assert.Equal(t, "user", username)
+	assert.Equal(t, "password", password)
+	assert.Equal(t, "localhost", host)
+	assert.Equal(t, uint(5432), port)
+	assert.Equal(t, "/database", path)
+	assert.Equal(t, "", query)
+	assert.Equal(t, "", fragment)
+}
+```
+
+I'm not going to expand too much on this but there's probably room for improvements and it could definitely use some more testing!
+
+## Conclusion
+
+And here we go, we wrote a simple Go parser library with very basic primitives and are able to use it to parse two data formats: hexadecimal color codes and URLs.
+
+I intentionally did not build a lot of basic blocks. When you have a look at https://github.com/rust-bakery/nom it provides many utils but in Go, abstraction (understand interfaces) has a cost.
+
+One next step could be supporting more complex formats such as JSON but this will be for another day!
+
+See you next time :wave:
