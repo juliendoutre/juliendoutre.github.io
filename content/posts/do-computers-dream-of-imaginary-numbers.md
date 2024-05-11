@@ -88,7 +88,7 @@ It's better but what about 0? With this schema, both `10000000` and `00000000` w
 
 Hopefully, there's a solution named the two's complement method.
 
-TODO
+WIP
 
 Relative integers are often available under types such as `integer <N>` or `int<N>` with `N` being one of `8`, `16`, `32` or `64`.
 
