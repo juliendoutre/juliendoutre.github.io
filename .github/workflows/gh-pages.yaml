@@ -1,9 +1,17 @@
 name: release
+
 on:
   push:
     branches:
       - main
-  pull_request:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-22.04
