@@ -72,7 +72,7 @@ I noticed compilation errors at build time because of missing dev libraries that
 - run: sudo apt-get update && sudo apt-get install -y libasound2-dev libudev-dev
 ```
 
-Then I created a CD workflow to build and deploy the game to a GitHub page: https://juliendoutre.github.io/froggy:
+Then I created a CD workflow to build and deploy the game to a GitHub page:
 
 ```yaml
 name: CD
