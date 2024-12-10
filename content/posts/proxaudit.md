@@ -194,4 +194,20 @@ Now I can run `HTTPS_PROXY=http://localhost:8000 curl https://google.com` withou
 [Code checkpoint](https://github.com/juliendoutre/proxaudit/tree/be4704f55d7400d5340b2dd67ccef01e3e88a6ff)
 {{</ alert >}}
 
-But... it's simply logging CONNECT requests, not the underlying HTTPS requests. As the proxy blindly forward the TLS connection to the host, it does not have access to the raw content. And it's why TLS is used for, right? Preventing eavesdroppers from intercepting cleartext traffic. There's a way to overcome this though by using Man-In-The-Middle (MITM) certificate crafting.
+But... it's simply logging CONNECT requests, not the underlying HTTPS requests. As the proxy blindly forward the TLS connection to the host, it does not have access to the raw content. And it's why TLS is used for, right? Preventing eavesdroppers from intercepting cleartext traffic. Fortunately, there's a way to overcome this though by using Man-In-The-Middle (MITM) certificate crafting.
+
+I read https://docs.mitmproxy.org/stable/concepts-howmitmproxyworks/#explicit-https from the [mitmproxy](https://mitmproxy.org/) Python project to understand the technique at play. The idea is to craft a fake certificate using a Certificate Authority (CA) under our control and that is trusted by the client to terminate the connection in the proxy. Then open a second connection to the server to forward requests after they've been handled by the proxy. This requires to fetch the destination's certificate to craft a matching certificate.
+
+As my end goal is to make an open source observability tool, I can ask users to trust a certificate that would intercept their traffic. I first ran:
+```shell
+openssl genrsa -out ca.key 4096
+openssl req -new -x509 -days 365 -key ca.key -out ca.crt
+openssl req -newkey rsa:4096 -nodes -keyout server.key -subj "/CN=localhost" -out server.csr
+openssl x509 -req -extfile <(printf "subjectAltName=DNS:localhost") -days 365 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt
+```
+to generate a CA and a certificate for my proxy before a colleague told me about https://github.com/FiloSottile/mkcert:
+```shell
+brew install mkcert
+mkcert -install
+mkcert localhost
+```
