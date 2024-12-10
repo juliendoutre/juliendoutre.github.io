@@ -1,16 +1,16 @@
 ---
-title: "Kowalski, analysis!"
-description: "How do computers actually compute?"
+title: "Computers and mathematical functions"
+description: "Exploring the relationship between computers functions and calculus"
 date: "2024-03-28"
 ---
 
-{{< lead >}}How do computers actually compute?{{< /lead >}}
+{{< lead >}}Exploring the relationship between computers functions and calculus{{< /lead >}}
 {{< katex >}}
 
 ## Introduction
 
-{{< alert "none" >}}
-This article follows another one: [How do computers understand and store numbers?](https://juliendoutre.github.io/posts/do-computers-dream-of-imaginary-numbers).
+{{< alert "link" >}}
+This article follows another one: [How do computers understand and store numbers?](https://juliendoutre.github.io/posts/computers-and-numbers).
 {{</ alert >}}
 
 If data encoding is instrumental to information processing, it's only half of the story. You can't call it processing if it's not performing some kind of computations!

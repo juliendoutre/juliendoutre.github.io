@@ -1,5 +1,5 @@
 ---
-title: "The smooth and the partial: functions drifts"
+title: "How can computers be helpful at approaching derivatives?"
 description: "How can computers be helpful at approaching derivatives?"
 date: "2024-04-18"
 ---
@@ -9,8 +9,8 @@ date: "2024-04-18"
 
 ## Introduction
 
-{{< alert "none" >}}
-This article follows another one: [How do computers actually compute?](https://juliendoutre.github.io/posts/kowalski-analysis/).
+{{< alert "link" >}}
+This article follows another one: [Computers and mathematical functions](https://juliendoutre.github.io/posts/computers-and-functions/).
 {{</ alert >}}
 
 In our previous exploration of functions in the context of computers we encountered a lot of bummers. Today, let's talk about how computers can actually be useful and solve real world problems!
