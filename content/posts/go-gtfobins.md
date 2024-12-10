@@ -13,6 +13,7 @@ It's a Go CLI built with the [cobra library](https://github.com/spf13/cobra) exp
 - `gogtfobins list` to list all binaries available on the host and the functions they can eventually allow to obtain
 - `gogtfobins describe BINARY` to print some details about a specific binary
 - `gogtfobins exploit BINARY FUNCTION` to run an exploit for a binary
+
 Here is a more concrete example:
 ```shell
 # List all available binaries allowing for opening a reverse shell on the current host.
