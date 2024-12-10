@@ -134,3 +134,64 @@ We got a plain HTTP request proxy working!
 {{< alert "github" >}}
 [Code checkpoint](https://github.com/juliendoutre/proxaudit/tree/0cba491ccc77774c5e18d56325deb5128aa08ad4)
 {{</ alert >}}
+
+Nowadays though, most people use HTTPS. Running `http_proxy=http://localhost:8000 curl https://google.com` does not result in any log on the proxy side. We could have expected this, we changed of protocol. But what happens if I run `HTTPS_PROXY=http://localhost:8000 curl https://google.com`?
+
+The server logs an error: `http: proxy error: unsupported protocol scheme ""` and curl returns an error as well: `curl: (56) CONNECT tunnel failed, response 502`.
+
+Why is this? I understood the issue while reading https://eli.thegreenplace.net/2022/go-and-proxy-servers-part-2-https-proxies/.
+
+A HTTPS connection can go through proxies but will only send a CONNECT request to them, indicating which host it targets. Then it's expecting the underlying TLS connection to be tunneled as is.
+
+In order to fix my code, I extended my `ServeHTTP` function like this:
+```golang
+func (h *handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	h.logger.Info("received request", zap.String("method", req.Method), zap.String("url", req.URL.String()))
+
+	if req.Method == http.MethodConnect {
+		h.handleConnect(rw, req)
+	} else {
+		httputil.NewSingleHostReverseProxy(req.URL).ServeHTTP(rw, req)
+	}
+}
+
+func (h *handler) handleConnect(rw http.ResponseWriter, req *http.Request) {
+	hijacker, ok := rw.(http.Hijacker)
+	if !ok {
+		http.Error(rw, "Hijacking not supported", http.StatusInternalServerError)
+
+		return
+	}
+
+	clientConn, _, err := hijacker.Hijack()
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusServiceUnavailable)
+
+		return
+	}
+	defer clientConn.Close()
+
+	serverConn, err := net.Dial("tcp", req.Host)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusServiceUnavailable)
+
+		return
+	}
+	defer serverConn.Close()
+
+	clientConn.Write([]byte("HTTP/1.1 200 Connection Established\r\n\r\n"))
+
+	go io.Copy(serverConn, clientConn)
+	io.Copy(clientConn, serverConn)
+}
+```
+
+The `handleConnect` menthod really just returns a success status to the client and then recover the underlying TCP connection (thanks to the `http.Hijacker` interface casting) to simply forward all the traffic to the destination host.
+
+Now I can run `HTTPS_PROXY=http://localhost:8000 curl https://google.com` without errors!
+
+{{< alert "github" >}}
+[Code checkpoint](https://github.com/juliendoutre/proxaudit/tree/be4704f55d7400d5340b2dd67ccef01e3e88a6ff)
+{{</ alert >}}
+
+But... it's simply logging CONNECT requests, not the underlying HTTPS requests. As the proxy blindly forward the TLS connection to the host, it does not have access to the raw content. And it's why TLS is used for, right? Preventing eavesdroppers from intercepting cleartext traffic. There's a way to overcome this though by using Man-In-The-Middle (MITM) certificate crafting.
