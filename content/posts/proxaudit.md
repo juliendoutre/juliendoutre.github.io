@@ -9,8 +9,8 @@ Something like a CI runner compiling a program for instance.
 How can you make sure to catch all artifacts it pulls from the outside (namely the Internet) or data it sends out?
 
 I tried using [eBPF](https://ebpf.io/) and [Frida](https://frida.re/) to achieve this but both proved to be difficult to use:
-* eBPF can intercept TCP packets in kernel space but TLS connections are negotiated by programs in userspace
-* eBPF (or Frida) can attach probes to programs functions, but dependening on their language, they may use different libs to perform HTTP requests. Supporting all of them is too dauting of a task.
+* eBPF can intercept TCP packets in kernel space but TLS connections are negotiated by programs in user space
+* eBPF (or Frida) can attach probes to functions in user space, but dependening on the languages at stake, different libs may be used to perform HTTP requests. Supporting all of them is too dauting of a task.
 
 A simpler approach would be to have HTTP requests go through a proxy server.
 The `HTTP_PROXY` and `HTTPS_PROXY` environment variables are a _de facto_ standard that many tools abide by.
@@ -141,7 +141,7 @@ The server logs an error: `http: proxy error: unsupported protocol scheme ""` an
 
 Why is this? I understood the issue while reading https://eli.thegreenplace.net/2022/go-and-proxy-servers-part-2-https-proxies/.
 
-A HTTPS connection can go through proxies but will only send a CONNECT request to them, indicating which host it targets. Then it's expecting the underlying TLS connection to be tunneled as is.
+A HTTPS connection can go through proxies but will only send a CONNECT request to them, indicating which host it targets. It's expecting the underlying TLS connection to be tunneled as is.
 
 In order to fix my code, I extended my `ServeHTTP` function like this:
 ```golang
@@ -211,3 +211,81 @@ brew install mkcert
 mkcert -install
 mkcert localhost
 ```
+
+I used the excellent https://github.com/elazarl/goproxy Go module to perform the MITM interception for me:
+```golang
+func main() {
+	// [...]
+
+	proxy := goproxy.NewProxyHttpServer()
+	proxy.Verbose = false
+	proxy.OnRequest().HandleConnect(goproxy.AlwaysMitm)
+	proxy.OnRequest(goproxy.ReqConditionFunc(
+		func(req *http.Request, _ *goproxy.ProxyCtx) bool {
+			return req.Method != http.MethodConnect
+		},
+	)).DoFunc(
+		func(req *http.Request, _ *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+			logger.Info("received a request", zap.String("method", req.Method), zap.String("url", req.URL.String()))
+
+			return req, nil
+		},
+	)
+
+	// [...]
+}
+```
+
+I configured the proxy to mitm connect requests and log all other methods. I replaced my custom handler with it:
+```golang
+server := &http.Server{
+	Addr:              ":" + strconv.FormatUint(*port, 10),
+	Handler:           proxy, // this line changed
+	ReadTimeout:       10 * time.Second,
+	ReadHeaderTimeout: 5 * time.Second,
+	IdleTimeout:       120 * time.Second,
+}
+```
+
+and loaded the CA I created with mkcert before starting it:
+```golang
+func main() {
+	mkcertDir := path.Join(os.Getenv("HOME"), "Library", "Application Support", "mkcert")
+
+	port := flag.Uint64("port", 8000, "port to listen on")
+	caCertPath := flag.String("ca-cert", path.Join(mkcertDir, "rootCA.pem"), "path to a CA certificate")
+	caKeyPath := flag.String("ca-key", path.Join(mkcertDir, "rootCA-key.pem"), "path to a CA private key")
+	flag.Parse()
+
+	logger, err := zap.NewProductionConfig().Build()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	cert, err := tls.LoadX509KeyPair(*caCertPath, *caKeyPath)
+	if err != nil {
+		logger.Panic("Failed loading CA certificate", zap.Error(err))
+	}
+
+	goproxy.GoproxyCa = cert
+
+	// [...]
+}
+```
+
+and now HTTPS interception works like a charm!
+
+```json
+{"level":"info","ts":1733868127.719048,"caller":"proxaudit/main.go:66","msg":"Starting HTTP proxy server...","port":8000}
+{"level":"info","ts":1733868147.167201,"caller":"proxaudit/main.go:50","msg":"received a request","method":"GET","url":"http://google.com/"}
+{"level":"info","ts":1733868150.407752,"caller":"proxaudit/main.go:50","msg":"received a request","method":"GET","url":"http://google.com/"}
+{"level":"info","ts":1733868150.427733,"caller":"proxaudit/main.go:50","msg":"received a request","method":"GET","url":"http://www.google.com/"}
+{"level":"info","ts":1733868156.662025,"caller":"proxaudit/main.go:50","msg":"received a request","method":"GET","url":"https://google.com:443/"}
+{"level":"info","ts":1733868160.218765,"caller":"proxaudit/main.go:50","msg":"received a request","method":"GET","url":"https://google.com:443/"}
+{"level":"info","ts":1733868160.5086799,"caller":"proxaudit/main.go:50","msg":"received a request","method":"GET","url":"https://www.google.com:443/"}
+^C{"level":"warn","ts":1733868173.727085,"caller":"proxaudit/main.go:70","msg":"HTTP proxy server was stopped","error":"http: Server closed"}
+```
+
+{{< alert "github" >}}
+[Code checkpoint](https://github.com/juliendoutre/proxaudit/tree/969be3daac2d8ec5c1a08549ec4133b456885869)
+{{</ alert >}}
