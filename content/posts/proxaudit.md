@@ -289,3 +289,17 @@ and now HTTPS interception works like a charm!
 {{< alert "github" >}}
 [Code checkpoint](https://github.com/juliendoutre/proxaudit/tree/969be3daac2d8ec5c1a08549ec4133b456885869)
 {{</ alert >}}
+
+Some tools may require more than setting `HTTPS_PROXY` to work. For instance:
+```shell
+HTTPS_PROXY=https://localhost:8000 npm i dd-trace
+```
+alone does not work. One need to run:
+```shell
+NODE_EXTRA_CA_CERTS="$(mkcert -CAROOT)/rootCA.pem" HTTPS_PROXY=https://localhost:8000 npm i dd-trace
+```
+to allow our local CA to emit trusted certificates.
+
+{{< alert "none" >}}
+Note that for old versions of NPM, there was an issue documented at https://github.com/dependabot/dependabot-core/issues/10623 when using goproxy.
+{{</ alert >}}
