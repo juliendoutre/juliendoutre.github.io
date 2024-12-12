@@ -10,7 +10,7 @@ How can you make sure to catch all artifacts it pulls from the outside (namely t
 
 I tried using [eBPF](https://ebpf.io/) and [Frida](https://frida.re/) to achieve this but both proved to be difficult to use:
 * eBPF can intercept TCP packets in kernel space but TLS connections are negotiated by programs in user space
-* eBPF (or Frida) can attach probes to functions in user space, but dependening on the languages at stake, different libs may be used to perform HTTP requests. Supporting all of them is too dauting of a task.
+* eBPF (or Frida) can attach probes to functions in user space, but depending on the languages at stake, different libs may be used to perform HTTP requests. Supporting all of them is too dauting of a task.
 
 A simpler approach would be to have HTTP requests go through a proxy server.
 The `HTTP_PROXY` and `HTTPS_PROXY` environment variables are a _de facto_ standard that many tools abide by.
@@ -196,7 +196,7 @@ Now I can run `HTTPS_PROXY=http://localhost:8000 curl https://google.com` withou
 
 But... it's simply logging CONNECT requests, not the underlying HTTPS requests. As the proxy blindly forward the TLS connection to the host, it does not have access to the raw content. And it's why TLS is used for, right? Preventing eavesdroppers from intercepting cleartext traffic. Fortunately, there's a way to overcome this though by using Man-In-The-Middle (MITM) certificate crafting.
 
-I read https://docs.mitmproxy.org/stable/concepts-howmitmproxyworks/#explicit-https from the [mitmproxy](https://mitmproxy.org/) Python project to understand the technique at play. The idea is to craft a fake certificate using a Certificate Authority (CA) under our control and that is trusted by the client to terminate the connection in the proxy. Then open a second connection to the server to forward requests after they've been handled by the proxy. This requires to fetch the destination's certificate to craft a matching certificate.
+I read [some documentation](https://docs.mitmproxy.org/stable/concepts-howmitmproxyworks/#explicit-https) from the [mitmproxy](https://mitmproxy.org/) Python project to understand the technique at play. The idea is to craft a fake certificate using a Certificate Authority (CA) under our control and that is trusted by the client to terminate the connection in the proxy. Then open a second connection to the server to forward requests after they've been handled by the proxy. This requires to fetch the destination's certificate to craft a matching certificate.
 
 As my end goal is to make an open source observability tool, I can ask users to trust a certificate that would intercept their traffic. I first ran:
 ```shell
@@ -303,3 +303,23 @@ to allow our local CA to emit trusted certificates.
 {{< alert "none" >}}
 Note that for old versions of NPM, there was an issue documented at https://github.com/dependabot/dependabot-core/issues/10623 when using goproxy.
 {{</ alert >}}
+
+## Introducing proxaudit!
+
+The final stage for me was to use all this logic in a tool that can wrap any command and observe its HTTP(s) requests thanks to a proxy. Check out https://github.com/juliendoutre/proxaudit to see the project's latest version!
+
+```shell
+brew tap juliendoutre/proxaudit https://github.com/juliendoutre/proxaudit
+brew install proxaudit
+mkcert -install
+proxaudit -- curl http://google.com
+proxaudit -- curl https://google.com
+proxaudit # Read from stdin
+proxaudit -output logs.jsonl -- curl https://google.com # Write logs to file
+```
+
+I took inspiration from  https://github.com/99designs/aws-vault for the design (especially the way they forward signals to subprocesses).
+
+Let me know if anything is missing or if you found a bug by opening [an issue](https://github.com/juliendoutre/proxaudit/issues) :pray:
+
+See you next time :wave:
