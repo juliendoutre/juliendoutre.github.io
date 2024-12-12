@@ -186,7 +186,7 @@ func (h *handler) handleConnect(rw http.ResponseWriter, req *http.Request) {
 }
 ```
 
-The `handleConnect` menthod really just returns a success status to the client and then recover the underlying TCP connection (thanks to the `http.Hijacker` interface casting) to simply forward all the traffic to the destination host.
+The `handleConnect` method really just returns a success status to the client and then recover the underlying TCP connection (thanks to the `http.Hijacker` interface casting) to simply forward all the traffic to the destination host.
 
 Now I can run `HTTPS_PROXY=http://localhost:8000 curl https://google.com` without errors!
 
