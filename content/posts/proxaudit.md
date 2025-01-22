@@ -1,6 +1,6 @@
 ---
 title: "Writing a HTTPS proxy in Golang"
-description: "An experiment and side project about HTTPS proxying in Go"
+summary: "An experiment and side project about HTTPS proxying in Go"
 date: "2024-12-09"
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: "Living off the land in Linux!"
-description: "I developed a Go program to exploit misconfigurations in Linux binaries based on https://gtfobins.github.io"
+summary: "I developed a Go program to exploit misconfigurations in Linux binaries based on https://gtfobins.github.io"
 date: "2024-12-03"
 ---
 

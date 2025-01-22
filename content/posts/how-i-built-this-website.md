@@ -1,6 +1,6 @@
 ---
 title: "How I built this website"
-description: "An explanation of how this website is built and served"
+summary: "An explanation of how this website is built and served"
 date: "2023-04-03"
 ---
 I wanted to have my own blog for a long time. Finally, some day last week, I found the time to set up one. This article will reflect on my thought process and the stack I ended up choosing.

@@ -1,7 +1,8 @@
 ---
 title: "How can computers be helpful at approaching derivatives?"
-description: "How can computers be helpful at approaching derivatives?"
+summary: "How can computers be helpful at approaching derivatives?"
 date: "2024-04-18"
+draft: true
 ---
 
 {{< lead >}}How can computers be helpful at approaching derivatives?{{< /lead >}}

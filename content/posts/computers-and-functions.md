@@ -1,7 +1,8 @@
 ---
 title: "Computers and mathematical functions"
-description: "Exploring the relationship between computers functions and calculus"
+summary: "Exploring the relationship between computers functions and calculus"
 date: "2024-03-28"
+draft: true
 ---
 
 {{< lead >}}Exploring the relationship between computers functions and calculus{{< /lead >}}

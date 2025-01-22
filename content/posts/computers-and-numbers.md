@@ -1,7 +1,8 @@
 ---
 title: "How do computers understand and store numbers?"
-description: "How do computers understand and store numbers?"
+summary: "How do computers understand and store numbers?"
 date: "2024-03-25"
+draft: true
 ---
 
 {{< lead >}}How do computers understand and store numbers?{{< /lead >}}

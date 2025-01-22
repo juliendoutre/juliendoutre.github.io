@@ -1,6 +1,6 @@
 ---
 title: "Some statistics about Vincennes' half marathon (2022)"
-description: "Web scraping and histograms"
+summary: "Web scraping and histograms"
 date: "2025-01-22"
 ---
 

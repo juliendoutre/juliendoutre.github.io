@@ -1,6 +1,6 @@
 ---
 title: "Let's write a parsing library in Go!"
-description: "Walkthrough of an encoding/decoding library implementation"
+summary: "Walkthrough of an encoding/decoding library implementation"
 date: "2024-04-03"
 ---
 

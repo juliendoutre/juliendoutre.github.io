@@ -1,6 +1,6 @@
 ---
 title: "I (almost) wrote a game in Rust with Bevy!"
-description: "But in the end I just messed around with GitHub actions"
+summary: "But in the end I just messed around with GitHub actions"
 date: "2024-05-11"
 ---
 
