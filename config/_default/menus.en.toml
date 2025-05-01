@@ -10,7 +10,7 @@ weight = 10
 
 [[main]]
 name = "WAREC"
-pageRef = "warec"
+url = "warec"
 weight = 10
 
 [[main]]
