@@ -9,11 +9,6 @@ pageRef = "readings"
 weight = 10
 
 [[main]]
-name = "WAREC"
-url = "https://juliendoutre.github.io/warec/"
-weight = 10
-
-[[main]]
 identifier = "search"
 weight = 20
 [main.params]

@@ -1,5 +1,5 @@
-{{- partial "partials/functions/warnings.html" .Site -}}
-{{- partial "partials/functions/init.html" . -}}
+{{- partial "functions/warnings.html" .Site -}}
+{{- partial "functions/init.html" . -}}
 <!DOCTYPE html>
 <html lang="{{ with .Site.Params.isoCode | default (.Site.LanguageCode | default " en") }} {{- . -}} {{ end }}" dir="{{ if .Site.Params.rtl | default false -}}
     rtl
@@ -21,7 +21,7 @@
   {{ if templates.Exists $header }}
   {{ partial $header . }}
   {{ else }}
-  {{ partial "partials/header/basic.html" . }}
+  {{ partial "header/basic.html" . }}
   {{ end }}
   <div class="relative flex flex-col grow">
     <main id="main-content" class="grow">

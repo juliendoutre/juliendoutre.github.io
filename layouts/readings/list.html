@@ -1,0 +1,41 @@
+{{ define "main" }}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
+<h3 class="text-xl font-bold dark:text-white">{{ .Title }}</h3>
+
+<p class="my-4 text-gray-500">
+    {{ .Content }}
+</p>
+
+<ol class="relative border-s border-gray-200 dark:border-gray-700 mt-6">
+    {{ range .Params.readings }}
+    <li class="mb-6 ms-6">
+        <span
+            class="absolute flex items-center justify-center w-7 h-7 bg-blue-100 rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
+            <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M5 19V4c0-.6.4-1 1-1h12c.6 0 1 .4 1 1v13H7a2 2 0 0 0-2 2Zm0 0c0 1.1.9 2 2 2h12M9 3v14m7 0v4" />
+            </svg>
+        </span>
+
+        {{ if .date }}
+        <time class="text-sm font-normal leading-none text-gray-400 dark:text-gray-500">{{ .date }}</time>
+        {{ end }}
+
+        {{ range .books }}
+        <h3 class="text-base text-gray-900 dark:text-white">
+            <i>{{ .title }}</i>, {{ .author }}
+            {{ if .currently_reading }}
+            <span
+                class="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300 ms-3">
+                Currently reading
+            </span>
+            {{ end }}
+        </h3>
+        {{ end }}
+    </li>
+    {{ end }}
+</ol>
+{{ end }}
