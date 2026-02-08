@@ -2,7 +2,11 @@
 title: "Readings"
 layout: "readings"
 readings:
-  - date: "November"
+  - date: "February 2026"
+    books:
+      - title: "Anatèm"
+        author: "Neal Stephenson"
+  - date: "November 2025"
     books:
       - title: "Moby-Dick"
         author: "Herman Melville"
