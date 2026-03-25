@@ -10,7 +10,6 @@ readings:
     books:
       - title: "Moby-Dick"
         author: "Herman Melville"
-        currently_reading: true
       - title: "A Voyage For Madmen"
         author: "Peter Nichols"
   - date: "September 2025"
