@@ -9,6 +9,11 @@ pageRef = "readings"
 weight = 10
 
 [[main]]
+name = "Challenges"
+pageRef = "challenges"
+weight = 15
+
+[[main]]
 identifier = "search"
 weight = 20
 [main.params]

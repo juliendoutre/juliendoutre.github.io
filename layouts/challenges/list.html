@@ -1,0 +1,158 @@
+{{ define "main" }}
+
+<style>
+    .challenges-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .challenge-card {
+        display: flex;
+        flex-direction: column;
+        padding: 1.25rem;
+        border-width: 1px;
+        border-style: solid;
+        border-color: var(--color-neutral-200);
+        border-radius: 0.5rem;
+        transition: border-color 0.2s;
+    }
+
+    .challenge-card:hover {
+        border-color: var(--color-primary-500);
+    }
+
+    .challenge-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .challenge-category {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.15rem 0.5rem;
+        border-radius: 9999px;
+    }
+
+    .category-security { background: #fde8e8; color: #9b1c1c; }
+    .category-crypto { background: #e1effe; color: #1e429f; }
+    .category-coding { background: #def7ec; color: #03543f; }
+    .category-cloud { background: #fef3c7; color: #92400e; }
+
+    :is(.dark) .category-security { background: #771d1d; color: #fde8e8; }
+    :is(.dark) .category-crypto { background: #1e3a5f; color: #c3dafe; }
+    :is(.dark) .category-coding { background: #014737; color: #bcf0da; }
+    :is(.dark) .category-cloud { background: #78350f; color: #fef3c7; }
+
+    .challenge-card.card-security { border-color: #f8b4b4; }
+    .challenge-card.card-crypto { border-color: #a4cafe; }
+    .challenge-card.card-coding { border-color: #84e1bc; }
+    .challenge-card.card-cloud { border-color: #fcd34d; }
+
+    :is(.dark) .challenge-card.card-security { border-color: #9b1c1c; }
+    :is(.dark) .challenge-card.card-crypto { border-color: #1e429f; }
+    :is(.dark) .challenge-card.card-coding { border-color: #03543f; }
+    :is(.dark) .challenge-card.card-cloud { border-color: #92400e; }
+
+    .challenge-name {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .challenge-name a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .challenge-name a:hover {
+        color: var(--color-primary-500);
+    }
+
+    .challenge-desc {
+        font-size: 0.85rem;
+        color: var(--color-neutral-500);
+        margin-bottom: 0.75rem;
+        flex-grow: 1;
+    }
+
+    .challenge-links {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--color-neutral-200);
+    }
+
+    .challenge-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.8rem;
+        text-decoration: none;
+        color: var(--color-primary-500);
+    }
+
+    .challenge-link:hover {
+        text-decoration: underline;
+    }
+
+    .challenge-link svg {
+        width: 0.9rem;
+        height: 0.9rem;
+        flex-shrink: 0;
+    }
+</style>
+
+<h3 class="text-xl font-bold dark:text-white">{{ .Title }}</h3>
+
+<p class="my-4 text-gray-500">
+    {{ .Content }}
+</p>
+
+<div class="challenges-grid">
+    {{ range .Params.challenges }}
+    <div class="challenge-card card-{{ .category }}">
+        <div class="challenge-header">
+            <span class="challenge-category category-{{ .category }}">{{ .category }}</span>
+        </div>
+        <div class="challenge-name">
+            <a href="{{ .site }}" target="_blank">{{ .name }}</a>
+        </div>
+        <div class="challenge-desc">{{ .description }}</div>
+        <div class="challenge-links">
+            <a href="{{ .site }}" target="_blank" class="challenge-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13.213 9.787a3.391 3.391 0 0 0-4.795 0l-3.425 3.426a3.39 3.39 0 0 0 4.795 4.794l.321-.304m-.321-4.49a3.39 3.39 0 0 0 4.795 0l3.424-3.426a3.39 3.39 0 0 0-4.794-4.795l-1.028.961" />
+                </svg>
+                Website
+            </a>
+            {{ with .profile }}
+            <a href="{{ . }}" target="_blank" class="challenge-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.949 8.949 0 0 0 4.951-1.488A3.987 3.987 0 0 0 13 16h-2a3.987 3.987 0 0 0-3.951 3.512A8.948 8.948 0 0 0 12 21Zm3-11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg>
+                Profile
+            </a>
+            {{ end }}
+            {{ with .writeups }}
+            <a href="{{ . }}" target="_blank" class="challenge-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 3v4a1 1 0 0 1-1 1H5m4 8h6m-6-4h6m4-8v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7.914a1 1 0 0 1 .293-.707l3.914-3.914A1 1 0 0 1 9.914 3H18a1 1 0 0 1 1 1Z" />
+                </svg>
+                Write-ups
+            </a>
+            {{ end }}
+        </div>
+    </div>
+    {{ end }}
+</div>
+{{ end }}
