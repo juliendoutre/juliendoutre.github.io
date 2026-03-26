@@ -1,6 +1,15 @@
 {{ define "main" }}
 
 <style>
+    /* --- Summary --- */
+    .readings-summary {
+        font-size: 0.85rem;
+        color: rgba(var(--color-neutral-500), 1);
+        margin-top: 0.5rem;
+        font-weight: 500;
+    }
+
+    /* --- Timeline --- */
     .readings-timeline {
         position: relative;
         margin-top: 1.5rem;
@@ -18,15 +27,28 @@
         background: rgba(var(--color-neutral-200), 1);
     }
 
+    /* --- Entry --- */
     .readings-entry {
         position: relative;
         margin-bottom: 1.5rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.375rem;
+        transition: background 0.15s;
     }
 
+    .readings-entry:hover {
+        background: rgba(var(--color-neutral-100), 0.5);
+    }
+
+    :is(.dark) .readings-entry:hover {
+        background: rgba(var(--color-neutral-700), 0.2);
+    }
+
+    /* --- Icon --- */
     .readings-icon {
         position: absolute;
-        left: -2.45rem;
-        top: -0.05rem;
+        left: -2.8rem;
+        top: 0.4rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -43,12 +65,40 @@
         color: rgba(var(--color-primary-700), 1);
     }
 
-    .readings-date {
-        font-size: 0.8rem;
-        color: rgba(var(--color-neutral-400), 1);
-        margin-bottom: 0.25rem;
+    /* Pulsing dot for currently reading */
+    .readings-icon-active {
+        background: rgba(var(--color-primary-500), 1);
     }
 
+    .readings-icon-active svg {
+        color: #fff;
+    }
+
+    .readings-icon-active::after {
+        content: "";
+        position: absolute;
+        inset: -4px;
+        border-radius: 9999px;
+        border: 2px solid rgba(var(--color-primary-500), 0.5);
+        animation: pulse-ring 2s ease-out infinite;
+    }
+
+    @keyframes pulse-ring {
+        0% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    /* --- Date --- */
+    .readings-date {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: rgba(var(--color-neutral-400), 1);
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    /* --- Book --- */
     .readings-book {
         font-size: 0.95rem;
         color: rgba(var(--color-neutral-700), 1);
@@ -57,6 +107,7 @@
 
     .readings-book-title {
         font-style: italic;
+        font-weight: 500;
     }
 
     .readings-book-author {
@@ -89,10 +140,17 @@
     {{ .Content }}
 </p>
 
+<!-- Book count -->
+{{ $count := 0 }}
+{{ range .Params.readings }}{{ $count = add $count (len .books) }}{{ end }}
+<div class="readings-summary">{{ $count }} books and counting.</div>
+
 <div class="readings-timeline">
     {{ range .Params.readings }}
+    {{ $has_active := false }}
+    {{ range .books }}{{ if .currently_reading }}{{ $has_active = true }}{{ end }}{{ end }}
     <div class="readings-entry">
-        <span class="readings-icon">
+        <span class="readings-icon {{ if $has_active }}readings-icon-active{{ end }}">
             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                     d="M5 19V4c0-.6.4-1 1-1h12c.6 0 1 .4 1 1v13H7a2 2 0 0 0-2 2Zm0 0c0 1.1.9 2 2 2h12M9 3v14m7 0v4" />
