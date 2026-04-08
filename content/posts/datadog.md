@@ -8,4 +8,7 @@ For the past two years, I've been part of the SDLC Security team at Datadog. Our
 - https://www.datadoghq.com/blog/container-image-signing/
 - https://www.datadoghq.com/blog/engineering/malicious-pull-requests/
 
+I also presented this latest project at the Datadog London Summit in 2026:
+- https://youtu.be/adnGvTTL5vA
+
 See you next time :wave:
