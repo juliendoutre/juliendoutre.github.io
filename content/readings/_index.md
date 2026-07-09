@@ -2,6 +2,17 @@
 title: "Readings"
 layout: "readings"
 readings:
+  - date: "June 2026"
+    books:
+      - title: "Le Pouvoir psychiatrique. Cours au Collège de France (1973-1974)"
+        author: "Michel Foucault"
+        currently_reading: true
+      - title: "Le sens du bétail"
+        author: "Ulysse Thevenon"
+  - date: "April 2026"
+    books:
+      - title: "Sur l'appareil d'État et la machine de guerre"
+        author: "Gilles Deleuze"
   - date: "February 2026"
     books:
       - title: "Anatèm"
@@ -28,7 +39,6 @@ readings:
     books:
       - title: "Einstein Gravity in a Nutshell"
         author: "Anthony Zee"
-        currently_reading: true
       - title: "Comment faire tomber un dictateur quand on est seul, tout petit, et sans armes"
         author: "Srdja Popovic"
   - date: "February 2025"
